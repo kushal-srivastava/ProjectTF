@@ -14,7 +14,7 @@ import matplotlib.pyplot as plt
 
 
 #jacobi iterations
-nn = 10
+nn = 1000
 
 scale_factor = - nn * nn
 
@@ -33,11 +33,15 @@ E = scale_factor * np.ones((nn-3, 1), float).flatten()
 A = diags([E, np.zeros((nn-2, 1), float).flatten(), E], [-1, 0, 1]).toarray()
 
 sol2 = np.zeros(np.size(x))
-
-for i in range(1000):
+n_iter = 20000
+#array for training data:
+inputData = np.zeros((n_iter, np.size(sol2)), float)
+for i in range(n_iter):
   sol2 = (load_function - np.dot(A, sol2)) / D
+  
+plt(x, sol2)
  
-print(exact_solution - sol2)
+
 
 
 
