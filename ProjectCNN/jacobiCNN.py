@@ -10,43 +10,50 @@ n_x: number of grid points in the discretization
 """
 import numpy as np
 from scipy.sparse import diags
+import tensorflow as tf
 import matplotlib.pyplot as plt
 
 
 #jacobi iterations
-nn = 10
+nn = 100
 
-scale_factor = - nn * nn
+scale_factor = nn * nn
 
 xx = np.linspace(0, 1, nn)
 x = xx[1:nn-1]
 
-load_function = 2 * np.exp(x) + x * np.exp(x) 
+load_function = 2. * np.exp(x) + x * np.exp(x) 
 #incorporating the boundary
 boundary_x0 = 0.
-boundary_x1 = 2 * np.exp(1) + np.exp(1)
+boundary_x1 = scale_factor * np.exp(1)
 load_function[0] = load_function[0] - boundary_x0
 load_function[nn-3] = load_function[nn-3] - boundary_x1
 
-exact_solution = 4 * x - 8 * np.exp(x) + 5 * x * np.exp(x) - np.exp(x) * x * x
+exact_solution = x * np.exp(x)
 
-D = scale_factor * -2 * np.ones((nn-2, 1), float).flatten()
+D = scale_factor * -2. * np.ones((nn-2, 1), float).flatten()
 E = scale_factor * np.ones((nn-3, 1), float).flatten()
 A = diags([E, np.zeros((nn-2, 1), float).flatten(), E], [-1, 0, 1]).toarray()
 
 sol2 = np.zeros(np.size(x))
 
-n_iter = 200
+n_iter = 6000
 #array for training data:
-inputData = np.zeros((n_iter, np.size(sol2)), float)
+training_data = np.zeros((n_iter, nn-2), float)
+training_data[0, :] = sol2
 for i in range(n_iter):
+  #dataTrain[i, :, 0] = sol2 #input to the network
   sol2 = (load_function - np.dot(A, sol2)) / D
-
-print(np.max(exact_solution - sol2))
-
+  training_data[i, :] = sol2 #iteration data for training the network
+  
 #plotting the results
-plt.plot(x, exact_solution, 'r')
+plt.plot(x, exact_solution, 'r', x, sol2, 'b')
 plt.show()
+
+
+
+
+
 
 
 
