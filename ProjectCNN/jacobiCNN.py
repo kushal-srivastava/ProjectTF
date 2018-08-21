@@ -2,7 +2,7 @@
 """
 Created on Wed Aug  8 15:25:57 2018
 
-@author: FOX0L48
+@author: Kushal
 x: meshgrid
 A: co-efficient matrix
 b: weight function
@@ -16,13 +16,13 @@ import matplotlib.pyplot as plt
 
 #jacobi iterations
 nn = 100
-
 scale_factor = nn * nn
 
 xx = np.linspace(0, 1, nn)
 x = xx[1:nn-1]
 
 load_function = 2. * np.exp(x) + x * np.exp(x) 
+
 #incorporating the boundary
 boundary_x0 = 0.
 boundary_x1 = scale_factor * np.exp(1)
@@ -56,53 +56,45 @@ for i in range(n_iter):
 plt.plot(x, exact_solution, 'r', x, sol2, 'b')
 plt.show()
 
+def fetch_batch(epoch, batch_index, batch_size):
+  shuffle_index = np.arange(n_iter)
+  np.random.shuffle( shuffle_index )
+  x_batch = training_data[shuffle_index, :, 0]
+  y_batch = training_data[shuffle_index, :, 1]
+  return x_batch, y_batch
+  
+
 #-------training network--------------
-featureSize = nn
-learning_rate = 0.01
-batch_size = 100
-n_batches = int(np.ceil(n_iter / batch_size))
+learning_rate = 0.05
+batch_size = 10
 batch_index = 0
-n_epochs = 100
+n_batches = int(np.ceil(n_iter / batch_size))
+n_epochs = 100000
 
-x_batch = tf.placeholder(tf.float32, shape=(None, nn), name="batchX")
-y_batch = tf.placeholder(tf.float32, shape=(None, nn), name="batchY")
+#input iteration value: training_data[:, :, 0]
+X = tf.placeholder(tf.float32, shape=(None, nn), name="batchX")
+#y output iteration value: training_data[:, :, 1]
+y = tf.placeholder(tf.float32, shape=(None, nn), name="batchY")
 
-jac_outputIter = tf.Variable(tf.zeros(nn), dtype=tf.float32, name="jacobiOutput")
-net_inputIter = tf.Variable(tf.zeros(nn), dtype=tf.float32, name="iterationInput")
-
-net_outputIter = tf.Variable(tf.zeros(nn), dtype=tf.float32, name="iterationOutput")
 weights = tf.Variable( tf.random_uniform([nn, nn], -1.0, 1.0), name="weights")
-iter_error = tf.Variable(tf.zeros(nn), dtype=tf.float32, name="iter_error")
-
-net_outputIter = tf.matmul(weights, tf.transpose(net_inputIter)
-
-#
-##the execution graph
-iter_error = tf.subtract(jac_outputIter, net_outputIter)
-mse = tf.reduce_mean(tf.square(iter_error), name="mse")
-
-init = tf.global_variables_initializer()
-
+output = tf.matmul( X, weights )
+error = tf.subtract(y, output)
+mse = tf.reduce_mean(tf.square(error), name="mse")
 optimizer = tf.train.GradientDescentOptimizer(learning_rate=learning_rate)
 training_op = optimizer.minimize(mse)
 
+init = tf.global_variables_initializer()
 
 with tf.Session() as sess:
   sess.run(init)
-    
   for epoch in range(n_epochs):
-    x_batch, y_batch = fetch_batch(epoch, batch_index, batch_size)
-    if epoch % 100 == 0:
-      print("Epoch", epoch, "MSE =", mse.eval())
-    sess.run(training_op)
-    
-best_weight = weights.eval()
-print(best_weight)
+    x_batch, y_batch = fetch_batch(0, batch_index, batch_size)
+    sess.run(training_op, feed_dict={X:x_batch, y:y_batch})
+    if epoch % 1000 == 0:
+      print(mse.eval(feed_dict={X:x_batch, y:y_batch}))
+    batch_index += 1  
 
-def fetch_batch(epoch, batch_index, batch_size):
-  x_batch = training_data[batch_index * batch_size:batch_index:batch_size + batch_size -1, :, 0]
-  y_batch = training_data[batch_index * batch_size:batch_index:batch_size + batch_size -1, :, 1]
-  return x_batch, y_batch
+
   
 
 
