@@ -42,3 +42,12 @@ sol = np.zeros(np.size(x))
 #for i in range(1000):
 #  sol1 = 1/D * (load_function - np.multiply(E1, np.insert(sol[1:nn-2], nn-3, 0)) - np.multiply(E2, np.insert(sol[0:nn-3], 0, 0) ) )
 #  sol = sol1
+#%%
+import tensorflow as tf
+import numpy as np
+indices = tf.constant([[4], [3], [1], [7]])
+updates = tf.constant([9, 10, 11, 12])
+shape = tf.constant([8])
+scatter = tf.scatter_nd(indices, updates, shape)
+with tf.Session() as sess:
+  print(sess.run(scatter))

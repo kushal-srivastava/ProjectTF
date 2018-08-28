@@ -6,7 +6,7 @@ Created on Wed Aug  8 15:25:57 2018
 x: meshgrid
 A: co-efficient matrix
 b: weight function
-n_x: number of grid points in the discretization
+nn: number of grid points in the discretization
 """
 import numpy as np
 from scipy.sparse import diags
@@ -15,7 +15,7 @@ import matplotlib.pyplot as plt
 
 
 #jacobi iterations
-nn = 100
+nn = 10
 scale_factor = nn * nn
 
 xx = np.linspace(0, 1, nn)
@@ -37,7 +37,7 @@ A = diags([E, np.zeros((nn-2, 1), float).flatten(), E], [-1, 0, 1]).toarray()
 
 sol2 = np.zeros(np.size(x))
 
-n_iter = 6000
+n_iter = 15000
 #array for training data:
 training_data = np.zeros((n_iter, nn, 2), float)
 
@@ -48,6 +48,7 @@ training_data[:, 0, 1] = boundary_x0
 training_data[:, nn-1, 1] = boundary_x1
 
 for i in range(n_iter):
+  sol2 = np.random.rand(nn-2)
   training_data[i, 1:nn-1, 0] = sol2 #input to the network
   sol2 = (load_function - np.dot(A, sol2)) / D
   training_data[i, 1:nn-1, 1] = sol2 #iteration data for training the network
@@ -65,11 +66,11 @@ def fetch_batch(epoch, batch_index, batch_size):
   
 
 #-------training network--------------
-learning_rate = 0.05
+learning_rate = 0.3
 batch_size = 10
 batch_index = 0
 n_batches = int(np.ceil(n_iter / batch_size))
-n_epochs = 100000
+n_epochs =100
 
 #input iteration value: training_data[:, :, 0]
 X = tf.placeholder(tf.float32, shape=(None, nn), name="batchX")
@@ -84,15 +85,17 @@ optimizer = tf.train.GradientDescentOptimizer(learning_rate=learning_rate)
 training_op = optimizer.minimize(mse)
 
 init = tf.global_variables_initializer()
+all_trainable_vars = tf.get_collection(tf.GraphKeys.TRAINABLE_VARIABLES)
 
 with tf.Session() as sess:
   sess.run(init)
   for epoch in range(n_epochs):
     x_batch, y_batch = fetch_batch(0, batch_index, batch_size)
     sess.run(training_op, feed_dict={X:x_batch, y:y_batch})
-    if epoch % 1000 == 0:
+    if epoch % 100 == 0:
       print(mse.eval(feed_dict={X:x_batch, y:y_batch}))
-    batch_index += 1  
+    batch_index += 1
+  print(all_trainable_vars)
 
 
   
