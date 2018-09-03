@@ -8,11 +8,13 @@ todo
 * epoch
 * batch_index: batch number used as seed for random input.
 """
-def fetch_batch(epoch, batch_index, batch_size):
+def fetch_batch(data, batch_size,epoch):
+    global n_iter
+    np.random.seed(epoch)
     shuffle_index = np.arange(n_iter)
     np.random.shuffle( shuffle_index )
-    x_batch = training_data[shuffle_index, :, 0]
-    y_batch = training_data[shuffle_index, :, 1]
+    x_batch = data[shuffle_index[:batch_size], :, 0]
+    y_batch = data[shuffle_index[:batch_size], :, 1]
     return x_batch, y_batch
 
 """
@@ -25,7 +27,8 @@ def fetch_batch(epoch, batch_index, batch_size):
 * n_batches: 
 * n_epochs: number of training iterations
 """
-nn = 5
+nn = 12
+n_iter = 100
 x = np.linspace(0, 1, nn)
 scale_factor = nn * nn
 
@@ -59,6 +62,9 @@ A = diags([E, np.zeros((nn-2, 1), float).flatten(), E], [-1, 0, 1]).toarray()
 init_weights = np.diag(np.random.rand(nn), 0) + np.diag(np.random.rand(nn-1), -1) \
                                             + np.diag(np.random.rand(nn-1), 1)
 
+D_1 =  np.ones((nn, 1), float).flatten()
+E_1 =  np.ones((nn-1, 1), float).flatten()
+A_1 = diags([E_1, D_1, E_1], [-1, 0, 1]).toarray()
 """
 todo
 * jacobi iterations to generate the data for training
@@ -67,7 +73,7 @@ todo
 * generate random input for the solver
 * store the input and output in training_data 
 """
-n_iter = 100
+
 training_data = np.zeros((n_iter, nn, 2), float)
 
 training_data[:, 0, 0] = x[0]
@@ -93,30 +99,35 @@ tensorflow variables
 * error: 
 * mse:
 """
+const_matrix = tf.constant(A_1,dtype=tf.float32)
 #input iteration value: training_data[:, :, 0]
 X = tf.placeholder(tf.float32, shape=(None, nn), name="batchX")
 #y output iteration value: training_data[:, :, 1]
 y = tf.placeholder(tf.float32, shape=(None, nn), name="batchY")
-weights = tf.Variable([nn, nn], dtype = tf.float32)
-weights = tf.convert_to_tensor(init_weights, dtype = tf.float32)
+weights = tf.Variable(np.random.rand(nn, nn), dtype = tf.float32)
+gen_tridiag = weights*const_matrix
+weight_assign = tf.assign(weights, gen_tridiag)
 
-trainable_weights = tf.where(weights > tf.constant(0.0))
-init = tf.global_variables_initializer()
+#weights = tf.convert_to_tensor(init_weights, dtype = tf.float32)
 
-output = tf.multiply(weights, X)
+#trainable_weights = tf.where(weights > tf.constant(0.0))
+output = tf.multiply(X,weights)
 error = tf.subtract(y, output)
 mse = tf.reduce_mean(tf.square(error), name="mse")
 
 optimizer = tf.train.GradientDescentOptimizer(0.5)
 training_op = optimizer.minimize(mse)
+init = tf.global_variables_initializer()
+print(error)
 
-with tf.Session() as sess:
-    sess.run(init)
-    for epoch in range(n_epochs):
-        x_batch, y_batch = fetch_batch(0, batch_index, batch_size)
-        sess.run(training_op, feed_dict={X:x_batch, y:y_batch})
-        if epoch % 100 == 0:
-            print(mse.eval(feed_dict={X:x_batch, y:y_batch}))
-        batch_index += 1
-
-print(all_trainable_vars)
+#with tf.Session() as sess:
+#    sess.run(init)
+#    for epoch in range(n_epochs):
+#        x_batch, y_batch = fetch_batch(0, epoch, batch_size)
+#        sess.run(training_op, feed_dict={X:x_batch, y:y_batch})
+#        sess.run(weight_assign)
+#        if epoch % 10 == 0:
+#            print(mse.eval(feed_dict={X:x_batch, y:y_batch}))
+#        #batch_index += 1
+#
+#print(all_trainable_vars)
