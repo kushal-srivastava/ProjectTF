@@ -106,13 +106,13 @@ X = tf.placeholder(tf.float32, shape=(None, nn), name="batchX")
 y = tf.placeholder(tf.float32, shape=(None, nn), name="batchY")
 weights = tf.Variable(np.random.rand(nn, nn), dtype = tf.float32)
 
-#gen_tridiag = weights * const_matrix
-#weight_assign = tf.assign(weights, gen_tridiag)
+gen_tridiag = weights * const_matrix
+weight_assign = tf.assign(weights, gen_tridiag)
 
 #weights = tf.convert_to_tensor(init_weights, dtype = tf.float32)
 #trainable_weights = tf.where(weights > tf.constant(0.0))
 
-output = tf.multiply(weights, tf.transpose(X), name="Mul_output")
+output = tf.matmul(X, weights, name="Mul_output")
 #error = tf.subtract(y, output, name="error")
 mse = tf.reduce_mean(tf.square(y - output), name="mse")
 
@@ -132,7 +132,7 @@ with tf.Session() as sess:
           sess.run(training_op, feed_dict={X:x_batch, y:y_batch})
         except:
           print("Training operation failed.")
-#        sess.run(weight_assign)
+        sess.run(weight_assign)
         if epoch % 10 == 0:
             print(mse.eval(feed_dict={X:x_batch, y:y_batch}))
         #batch_index += 1
