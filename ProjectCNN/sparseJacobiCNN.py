@@ -27,7 +27,7 @@ def fetch_batch(data, batch_size,epoch):
 * n_batches: 
 * n_epochs: number of training iterations
 """
-nn = 12
+nn = 7
 n_iter = 100
 x = np.linspace(0, 1, nn)
 scale_factor = nn * nn
@@ -105,29 +105,35 @@ X = tf.placeholder(tf.float32, shape=(None, nn), name="batchX")
 #y output iteration value: training_data[:, :, 1]
 y = tf.placeholder(tf.float32, shape=(None, nn), name="batchY")
 weights = tf.Variable(np.random.rand(nn, nn), dtype = tf.float32)
-gen_tridiag = weights*const_matrix
-weight_assign = tf.assign(weights, gen_tridiag)
+
+#gen_tridiag = weights * const_matrix
+#weight_assign = tf.assign(weights, gen_tridiag)
 
 #weights = tf.convert_to_tensor(init_weights, dtype = tf.float32)
-
 #trainable_weights = tf.where(weights > tf.constant(0.0))
-output = tf.multiply(X,weights)
-error = tf.subtract(y, output)
-mse = tf.reduce_mean(tf.square(error), name="mse")
+
+output = tf.multiply(weights, tf.transpose(X), name="Mul_output")
+#error = tf.subtract(y, output, name="error")
+mse = tf.reduce_mean(tf.square(y - output), name="mse")
 
 optimizer = tf.train.GradientDescentOptimizer(0.5)
 training_op = optimizer.minimize(mse)
 init = tf.global_variables_initializer()
-print(error)
+#print(error)
+#epoch = 11
+#x_batch, y_batch = fetch_batch(training_data, batch_size, epoch)
 
-#with tf.Session() as sess:
-#    sess.run(init)
-#    for epoch in range(n_epochs):
-#        x_batch, y_batch = fetch_batch(0, epoch, batch_size)
-#        sess.run(training_op, feed_dict={X:x_batch, y:y_batch})
+#%%
+with tf.Session() as sess:
+    sess.run(init)
+    for epoch in range(n_epochs):
+        x_batch, y_batch = fetch_batch(training_data, batch_size, epoch)
+        try:
+          sess.run(training_op, feed_dict={X:x_batch, y:y_batch})
+        except:
+          print("Training operation failed.")
 #        sess.run(weight_assign)
-#        if epoch % 10 == 0:
-#            print(mse.eval(feed_dict={X:x_batch, y:y_batch}))
-#        #batch_index += 1
-#
-#print(all_trainable_vars)
+        if epoch % 10 == 0:
+            print(mse.eval(feed_dict={X:x_batch, y:y_batch}))
+        #batch_index += 1
+

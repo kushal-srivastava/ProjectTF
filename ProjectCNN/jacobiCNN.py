@@ -95,7 +95,21 @@ with tf.Session() as sess:
     if epoch % 100 == 0:
       print(mse.eval(feed_dict={X:x_batch, y:y_batch}))
     batch_index += 1
+    #resetting the off-diagonal weights
+    
   print(all_trainable_vars)
+
+def reset_weights():
+  for i in range(nn-2):
+    weights[i, i+2:nn] = 0
+
+
+  
+  
+  
+  
+
+    
 
 
   
