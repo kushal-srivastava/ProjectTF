@@ -26,7 +26,7 @@ def fetch_batch(data, batch_size,epoch, n_iter):
 * E_1: vector of ones with len:nn-1
 * A_1: tridiagonal matrix(ones) used to reshape the weights
 """
-def solveNetwork(data, learning_rate, n_epochs, batch_size):
+def solveNetwork(data, given_learning_rate, n_epochs, batch_size):
 	n_iter, nn, _ = np.shape(data)
 
 	#n_iter = 10000
@@ -46,7 +46,7 @@ def solveNetwork(data, learning_rate, n_epochs, batch_size):
 	#y output iteration value: training_data[:, :, 1]
 	y = tf.placeholder(tf.float32, shape=(None, nn), name="batchY")
 
-	#learning_rate = tf.placeholder_with_default(0.001, shape=(), name="learning_rate")
+	learning_rate = tf.placeholder_with_default(0.001, shape=(), name="learning_rate")
 	weights = tf.Variable(np.random.rand(nn, nn), dtype = tf.float32)
 
 	#maintaining the tridiagonal nature of the weight matrix
@@ -63,21 +63,22 @@ def solveNetwork(data, learning_rate, n_epochs, batch_size):
 
 	learning_rate_epoch = 0.6
 	count = 0
-	print("here")
+	#print("here")
 	with tf.Session() as sess:
 		sess.run(init)
 		for epoch in range(n_epochs):
-		  if epoch >= 30000:
-			learning_rate_epoch = 0.01
-			count += 1
-		  x_batch, y_batch = fetch_batch(data, batch_size, epoch, n_iter)
-		  try:
-			 sess.run(training_op, feed_dict={X:x_batch, y:y_batch, learning_rate:learning_rate_epoch})
-		  except:
-			print("Training operation failed.")
-			break
-		  sess.run(weight_assign)
-		  if epoch % 1000 == 0:
-			print(mse.eval(feed_dict={X:x_batch, y:y_batch}))
+			if epoch >= 30000:
+				learning_rate_epoch = 0.01
+				count += 1
+			x_batch, y_batch = fetch_batch(data, batch_size, epoch, n_iter)
+			try:
+				sess.run(training_op, feed_dict={X:x_batch, y:y_batch, learning_rate:learning_rate_epoch})
+			except:
+				print("Training operation failed.")				
+			sess.run(weight_assign)
+			if epoch % 1000 == 0:
+				print(mse.eval(feed_dict={X:x_batch, y:y_batch}))
+		return_weights = sess.run(weights)
+	return return_weights
 
 

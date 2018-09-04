@@ -1,7 +1,7 @@
 from jacobiSolver import jacobiSolver
+import numpy as np
 
-def test_and_plot(solution_weights, number_of_testIterations, learning_rate, \
-					number_of_trainingiterations, batch_size):
+def test_and_plot(solution_weights, number_of_testIterations):
 	_, nn = np.shape(solution_weights)
 	data = jacobiSolver(nn, number_of_testIterations)
 	mse_accumulator = np.zeros(number_of_testIterations, float)
