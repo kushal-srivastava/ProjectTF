@@ -27,16 +27,15 @@ def fetch_batch(data, batch_size,epoch):
 * n_batches: 
 * n_epochs: number of training iterations
 """
-nn = 7
-n_iter = 100
+nn = 50
+n_iter = 10000
 x = np.linspace(0, 1, nn)
 scale_factor = nn * nn
 
-learning_rate = 0.3
-batch_size = 10
-batch_index = 0
-n_batches = int(np.ceil(n_iter / batch_size))
-n_epochs =100
+batch_size = 500
+n_epochs =50000
+learning_rate_array = 0.6*np.exp(-20000*np.linspace(0.000001,0.001,5))
+
 
 load_function = 2. * np.exp(x) + x * np.exp(x)
 
@@ -104,36 +103,36 @@ const_matrix = tf.constant(A_1,dtype=tf.float32)
 X = tf.placeholder(tf.float32, shape=(None, nn), name="batchX")
 #y output iteration value: training_data[:, :, 1]
 y = tf.placeholder(tf.float32, shape=(None, nn), name="batchY")
+learning_rate = tf.placeholder_with_default(0.001, shape=(), name="learning_rate")
 weights = tf.Variable(np.random.rand(nn, nn), dtype = tf.float32)
 
 gen_tridiag = weights * const_matrix
 weight_assign = tf.assign(weights, gen_tridiag)
 
-#weights = tf.convert_to_tensor(init_weights, dtype = tf.float32)
-#trainable_weights = tf.where(weights > tf.constant(0.0))
+output = tf.matmul(weights, tf.transpose(X), name="Mul_output")
+#error = tf.losses()
+mse = tf.reduce_mean(tf.square(y - tf.transpose(output)), name="mse")
 
-output = tf.matmul(X, weights, name="Mul_output")
-#error = tf.subtract(y, output, name="error")
-mse = tf.reduce_mean(tf.square(y - output), name="mse")
-
-optimizer = tf.train.GradientDescentOptimizer(0.5)
+optimizer = tf.train.AdamOptimizer(learning_rate=learning_rate)
 training_op = optimizer.minimize(mse)
 init = tf.global_variables_initializer()
-#print(error)
-#epoch = 11
-#x_batch, y_batch = fetch_batch(training_data, batch_size, epoch)
+learning_rate_epoch = 0.6
 
-#%%
+count = 0
 with tf.Session() as sess:
     sess.run(init)
     for epoch in range(n_epochs):
-        x_batch, y_batch = fetch_batch(training_data, batch_size, epoch)
-        try:
-          sess.run(training_op, feed_dict={X:x_batch, y:y_batch})
-        except:
-          print("Training operation failed.")
-        sess.run(weight_assign)
-        if epoch % 10 == 0:
-            print(mse.eval(feed_dict={X:x_batch, y:y_batch}))
+      if epoch >= 30000:
+        learning_rate_epoch = 0.01
+        count += 1
+      x_batch, y_batch = fetch_batch(training_data, batch_size, epoch)
+      try:
+#        sess.run(training_op, feed_dict={X:x_batch, y:y_batch, learning_rate:learning_rate_epoch})
+         sess.run(training_op, feed_dict={X:x_batch, y:y_batch, learning_rate:learning_rate_epoch})        
+      except:
+        print("Training operation failed.")
+      sess.run(weight_assign)
+      if epoch % 1000 == 0:
+        print(mse.eval(feed_dict={X:x_batch, y:y_batch}))
         #batch_index += 1
 
