@@ -10,7 +10,6 @@ def test_and_plot(solution_weights, number_of_testIterations):
 		y = data[i,:,1]
 		y_1 = np.matmul(solution_weights, np.transpose(X))
 		error = np.square(y - y_1)
-		mse = np.mean(error)
-		mse_accumulator.append(mse)
+		mse_accumulator[i] = np.mean(error)
 	return max(mse_accumulator)
 	
