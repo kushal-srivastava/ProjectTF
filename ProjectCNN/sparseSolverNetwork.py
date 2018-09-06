@@ -41,7 +41,7 @@ def sparseNetworkSolver(data, given_learning_rate, n_epochs, batch_size):
     
     return_weights = tf.sparse_tensor_to_dense(weights)
 
-    output = tf.sparse_matmul(weights, tf.transpose(X), a_is_sparse=True)
+    output = tf.sparse_matmul(weights, X, transpose_a=False, transpose_b=True, a_is_sparse=True, b_is_sparse=False, name="multiply_Operation")
     mse = tf.reduce_mean(tf.square(y-tf.transpose(output)), name="mse")
 
     optimizer = tf.train.AdamOptimizer(learning_rate=learning_rate)
@@ -62,7 +62,7 @@ def sparseNetworkSolver(data, given_learning_rate, n_epochs, batch_size):
                 sess.run("Training operation failed")
             if epoch % 100 == 0:
                 print(mse.eval(feed_dict={X:x_batch, y:y_batch}))
-        learned_weights = sess.run(return_weights)
-    return learned_weights
+        sess.run(return_weights)
+    return 0.0 
 
 
