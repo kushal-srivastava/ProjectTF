@@ -1,7 +1,6 @@
 import numpy as np
 from scipy.sparse import diags
 
-
 """
 * nn: number of discretization points
 * scale_factor: (1/ h2) scaling of the elements 

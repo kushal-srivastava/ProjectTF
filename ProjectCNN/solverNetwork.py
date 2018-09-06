@@ -63,7 +63,6 @@ def solveNetwork(data, given_learning_rate, n_epochs, batch_size):
 
 	learning_rate_epoch = 0.6
 	count = 0
-	#print("here")
 	with tf.Session() as sess:
 		sess.run(init)
 		for epoch in range(n_epochs):
