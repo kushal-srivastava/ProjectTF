@@ -6,11 +6,11 @@ from sparseSolverNetwork import sparseNetworkSolver
 #import "test_and_plot.py"
 
 problem_size = 7
-number_of_jacobiIterations = 1000
+number_of_jacobiIterations = 500 
 
 learning_rate = 0.1
-number_of_trainingIterations = 5000
-batch_size = 50
+number_of_trainingIterations = 1000
+batch_size = 10
 
 number_of_testIterations = 100
 
