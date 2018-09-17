@@ -26,12 +26,9 @@ def fetch_batch(data, batch_size,epoch, n_iter):
 * E_1: vector of ones with len:nn-1
 * A_1: tridiagonal matrix(ones) used to reshape the weights
 """
-def solveNetwork(data, given_learning_rate, n_epochs, batch_size):
+def nn_train(data, given_learning_rate, n_epochs, batch_size):
 	n_iter, nn, _ = np.shape(data)
 
-	#n_iter = 10000
-	#batch_size = 500
-	#n_epochs =50000
 	#learning_rate_array = 0.6*np.exp(-20000*np.linspace(0.000001,0.001,5))
 
 	D_1 =  np.ones((nn, 1), float).flatten()
@@ -66,7 +63,7 @@ def solveNetwork(data, given_learning_rate, n_epochs, batch_size):
 	with tf.Session() as sess:
 		sess.run(init)
 		for epoch in range(n_epochs):
-			if epoch >= 30000:
+			if epoch >= 300:
 				learning_rate_epoch = 0.01
 				count += 1
 			x_batch, y_batch = fetch_batch(data, batch_size, epoch, n_iter)
@@ -75,7 +72,7 @@ def solveNetwork(data, given_learning_rate, n_epochs, batch_size):
 			except:
 				print("Training operation failed.")				
 			sess.run(weight_assign)
-			if epoch % 1000 == 0:
+			if epoch % 100 == 0:
 				print(mse.eval(feed_dict={X:x_batch, y:y_batch}))
 		return_weights = sess.run(weights)
 	return return_weights

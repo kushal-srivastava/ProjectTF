@@ -8,7 +8,6 @@ from scipy.sparse import diags
 * n_iter: number of iterations for jacobi solver
 """
 def jacobiSolver(problem_size, number_of_jacobiIterations):
-	
 	nn = problem_size
 	n_iter = number_of_jacobiIterations
 	x = np.linspace(0, 1, nn)

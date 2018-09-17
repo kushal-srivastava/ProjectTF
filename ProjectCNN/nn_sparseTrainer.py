@@ -18,7 +18,7 @@ def fetch_batch(data, batch_size, epoch):
 Function to train the network to perform one jacobi number_of_jacobiIterations
 Return: trained weights for a specific problem size.
 """
-def nn_sparseTrainer(data, learning_rate, n_epochs, batch_size):
+def nn_sparseTrain(data, learning_rate, n_epochs, batch_size):
 	
 	_, problem_size, _ = data.shape
 
@@ -78,7 +78,6 @@ def nn_sparseTrainer(data, learning_rate, n_epochs, batch_size):
 				print(mse.eval(feed_dict={X:x_batch, y:y_batch, tf_learning_rate:learning_rate}))
 		temp = sess.run(w)
 		return temp
-		# print(temp)
 
     
 
