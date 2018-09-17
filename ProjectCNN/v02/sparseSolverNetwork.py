@@ -5,9 +5,9 @@ import tensorflow as tf
 * define fetch_batch
 """
 def fetch_batch(data, batch_size, epoch):
-    n_iter, _, _ = np.shape()
+    n_iter, _, _ = data.shape
     np.random.seed(epoch)
-    shuffle_index = np.arrange(n_iter)
+    shuffle_index = np.arange(n_iter)
     np.random.shuffle( shuffle_index )
     x_batch = data[shuffle_index[:batch_size],:,0]
     y_batch = data[shuffle_index[:batch_size],:,1]

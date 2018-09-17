@@ -1,0 +1,7 @@
+The folder contains the older implementations of the jacobi solver using linear regression.
+
+Files:
+assign_Sparse: implementation of regression with weights linearly decomposed into (L + D + U) to ensure the sparsity. 
+sparseSolverNetwork: implementation of regression with attempted use of sparse matrix for weights. However, as sparse matrices are still not trainable, the purpose is not solved, nor does the code work.
+test_and_plot: generates random database for testing and currently prints the final error on the test db. 
+plot: provision for later stages of the project.
