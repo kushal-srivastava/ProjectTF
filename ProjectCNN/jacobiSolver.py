@@ -30,6 +30,12 @@ def jacobiSolver(problem_size, number_of_jacobiIterations):
 	D = scale_factor * -2. * np.ones((nn-2, 1), float).flatten()
 	E = scale_factor * np.ones((nn-3, 1), float).flatten()
 	A = diags([E, np.zeros((nn-2, 1), float).flatten(), E], [-1, 0, 1]).toarray()
+	jacobi_stencil = diags([E, D, E], [-1, 0, 1]).toarray()
+        print("----------------------------------------------------------")
+        print("Jacobi Stencil")
+        print("----------------------------------------------------------")
+        np.set_printoptions(suppress=True)
+        print(np.around(jacobi_stencil, 3))
 
 	"""
 	todo

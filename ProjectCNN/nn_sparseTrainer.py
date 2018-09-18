@@ -25,7 +25,7 @@ def nn_sparseTrain(data, learning_rate, n_epochs, batch_size):
 	"""
 	Algorithm tuning variables
 	"""
-    	count_LRswitch = 300
+    	count_LRSwitch = 4000 
     	msePrint_frequency = 100
 
     	"""
@@ -45,7 +45,7 @@ def nn_sparseTrain(data, learning_rate, n_epochs, batch_size):
 
 	y = tf.placeholder(tf.float64, shape=(None, problem_size), name="y")
 
-	tf_learning_rate = tf.placeholder(tf.float32, shape=(), name="learning_rate")
+	tf_learning_rate = tf.placeholder(tf.float64, shape=(), name="learning_rate")
 
 	
 	"""
@@ -67,15 +67,16 @@ def nn_sparseTrain(data, learning_rate, n_epochs, batch_size):
 	with tf.Session() as sess:
 		sess.run(init)
 		for epoch in range(n_epochs):
-			if epoch > count_LRswitch:
+			if epoch > count_LRSwitch:
 				learning_rate = 0.01
 			x_batch, y_batch = fetch_batch(data, batch_size, epoch)
 			try:
 				sess.run(training_op, feed_dict={X:x_batch, y:y_batch, tf_learning_rate:learning_rate})
 			except:
 				print("Training operation failed.")
-			if epoch % msePrint_frequency == 0:
-				print(mse.eval(feed_dict={X:x_batch, y:y_batch, tf_learning_rate:learning_rate}))
+			#if epoch % msePrint_frequency == 0:
+			#if epoch % n_epochs == 0:
+		print(mse.eval(feed_dict={X:x_batch, y:y_batch, tf_learning_rate:learning_rate}))
 		temp = sess.run(w)
 		return temp
 

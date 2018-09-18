@@ -2,13 +2,13 @@ from jacobiSolver import jacobiSolver
 from nn_trainer import nn_train
 from nn_sparseTrainer import nn_sparseTrain
 from nn_test import nn_test
-
+import numpy as np
 def main():
-    problem_size = 7
-    number_of_jacobiIterations = 750
+    problem_size = 7 
+    number_of_jacobiIterations = 1000
 
-    learning_rate = 0.
-    number_of_trainingIterations = 3500
+    learning_rate = 0.6
+    number_of_trainingIterations = 4500
     batch_size = 10
     number_of_testIterations = 100
 
@@ -33,6 +33,16 @@ def main():
     mse = nn_test(sparse_trained_weights, number_of_testIterations)
     print("mse error for test data using sparse trained weights is:", mse)
     print("------------------------------------------------------")
+    print("Trained Weights for non-sparse trainer")
+    print("------------------------------------------------------")
+    np.set_printoptions(suppress=True)
+    print(np.around(trained_weights, 3))
+    print("------------------------------------------------------")
+    print("Trained Weights for sparse trainer")
+    print("------------------------------------------------------")
+    print(np.around(sparse_trained_weights, 3))
+    print("------------------------------------------------------")
+
 
 if __name__ == "__main__":
     main()
